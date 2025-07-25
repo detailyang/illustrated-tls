@@ -13,8 +13,12 @@ test:
 		go test -timeout=5s $$i || exit 1; \
 	done
 
+site:
+	make -C generate
+
 clean:
 	rm -f server/server client/client
+	rm -f generate/generator
 
 realclean: clean
 	go clean -cache
@@ -25,5 +29,8 @@ vet:
 fmt:
 	go fmt ./...
 
-.PHONY: client server all clean realclean test fmt vet
+dist:
+	@if [[ -z "${DISTROOT}" ]]; then echo "Must set \$$DISTROOT variable"; exit 1; fi
+	rsync -rlpvhc site/ ${DISTROOT}/tls12/
 
+.PHONY: client server all clean realclean test fmt vet site
